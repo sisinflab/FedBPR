@@ -1,11 +1,13 @@
 import random
+import multiprocessing
+from .Worker import Worker
 
 random.seed(43)
 
 
 class Server:
-    def __init__(self, model, lr, fraction, positive_fraction, processing_strategy, send_strategy):
-        self._processing_strategy = processing_strategy
+    def __init__(self, model, lr, fraction, positive_fraction, mp, send_strategy):
+        self.mp = mp
         self._send_strategy = send_strategy
         self.model = model
         self.lr = lr
@@ -31,7 +33,21 @@ class Server:
         c_list = self.select_clients(clients, self.fraction)
         for i in c_list:
             self._send_strategy.send_item_vectors(clients, i, self.model)
-        self._processing_strategy.train_model(self, clients, c_list)
+        if not self.mp:
+            for i in c_list:
+                self.train_on_client(clients, i)
+        else:
+            #TODO: Multiprocessing is not working properly
+            tasks = multiprocessing.JoinableQueue()
+            num_workers = multiprocessing.cpu_count() - 1
+            workers = [Worker(tasks, self.train_on_client, clients) for _ in range(num_workers)]
+            for w in workers:
+                w.start()
+            for i in c_list:
+                tasks.put((clients, i))
+            for i in range(num_workers):
+                tasks.put(None)
+            tasks.join()
         for i in c_list:
             self._send_strategy.delete_item_vectors(clients, i)
         self._send_strategy.update_deltas(self.model, item_vecs_bak, item_bias_bak)

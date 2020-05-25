@@ -6,6 +6,7 @@ np.random.seed(43)
 class TripletSampler:
     def __init__(self, train_user_list, item_size, sampler_size):
         self.train_user_list = list(train_user_list)
+        self.train_user_set = set(train_user_list)
         self.item_size = item_size
         self.sampler_size = sampler_size
 
@@ -13,6 +14,6 @@ class TripletSampler:
         for _ in range(self.sampler_size):
             i = np.random.choice(self.train_user_list)
             j = np.random.randint(self.item_size)
-            while j in self.train_user_list:
+            while j in self.train_user_set:
                 j = np.random.randint(self.item_size)
             yield i, j

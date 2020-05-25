@@ -20,29 +20,21 @@ def main(args):
 
     exp_type = utils.create_file_prefix(args.positive_fraction, args.with_delta, args.fraction, args.sampler_size)
 
-    processing_strategy = ProcessingStrategy.MultiProcessing() if args.mp else ProcessingStrategy.SingleProcessing()
+    #processing_strategy = ProcessingStrategy.MultiProcessing() if args.mp else ProcessingStrategy.SingleProcessing()
     send_strategy = SendStrategy.SendDelta() if args.with_delta else SendStrategy.SendVector()
 
     for dataset in args.datasets:
         print("Working on", dataset, "dataset")
 
-        if not os.path.exists('results/{}'.format(dataset)):
-            os.makedirs('results/{}'.format(dataset))
+        if not os.path.exists('results/{}/recs'.format(dataset)):
+            os.makedirs('results/{}/recs'.format(dataset))
 
-        # Read the dataset and prepare it for training, validation and test
-        names = ['user_id', 'item_id', 'rating', 'utc']
-        df = pd.read_csv('datasets/' + dataset + '.tsv', sep='\t', dtype={'rating': 'float64', 'utc': 'int64'}, header=0, names=names)
-        df = df.groupby('user_id').filter(lambda x: len(x) >= 20)
-        print(df.shape[0], 'interactions read')
-        df = utils.convert_unique_idx(df, 'user_id')
-        df = utils.convert_unique_idx(df, 'item_id')
+        df = pd.read_csv('datasets/{}_trainingset.tsv'.format(dataset), sep='\t', names=['user_id', 'item_id', 'rating'])
+        df, reverse_dict = utils.convert_unique_idx(df, 'item_id')
         user_size = len(df['user_id'].unique())
         item_size = len(df['item_id'].unique())
         print('Found {} users and {} items'.format(user_size, item_size))
-        total_user_lists = utils.create_user_lists(df, user_size)
-        train_user_lists, validation_user_lists, test_user_lists = utils.split_train_test(total_user_lists,
-                                                                                test_size=0.2,
-                                                                                validation_size=args.validation_size)
+        train_user_lists = utils.create_user_lists(df, user_size, 3)
         train_interactions_size = sum([len(user_list) for user_list in train_user_lists])
         print('{} interactions considered for training'.format(train_interactions_size))
 
@@ -66,9 +58,9 @@ def main(args):
 
                 # Create server and clients
                 server_model = ServerModel(item_size, n_factors)
-                server = Server(server_model, lr, args.fraction, args.positive_fraction, processing_strategy, send_strategy)
+                server = Server(server_model, lr, args.fraction, args.positive_fraction, args.mp, send_strategy)
                 clients = [Client(u, ClientModel(n_factors), triplet_samplers[u], train_user_lists[u],
-                                  validation_user_lists[u], test_user_lists[u], sampler_size) for u in range(user_size)]
+                                  sampler_size) for u in range(user_size)]
 
                 # Start training
                 for i in range(args.n_epochs * round_modifier):
@@ -81,10 +73,10 @@ def main(args):
                     if ((i + 1) % (args.eval_every * round_modifier)) == 0:
                         exp_setting_3 = exp_setting_2 + "_I" + str((i + 1) / round_modifier)
                         results = server.predict(clients, max_k=100)
-                        with open('results/{}/{}{}.tsv'.format(dataset, exp_type, exp_setting_3), 'w') as out:
+                        with open('results/{}/recs/{}{}.tsv'.format(dataset, exp_type, exp_setting_3), 'w') as out:
                             for u in range(len(results)):
                                 for e, p in results[u].items():
-                                    out.write(str(u) + '\t' + str(e) + '\t' + str(p) + '\n')
+                                    out.write(str(u) + '\t' + str(reverse_dict[e]) + '\t' + str(p) + '\n')
 
 
 if __name__ == '__main__':
