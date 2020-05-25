@@ -4,7 +4,7 @@ import sys
 import random
 import os
 import argparse
-from modules import Server, ServerModel, Client, ClientModel, TripletSampler, ProcessingStrategy, SendStrategy
+from modules import Server, ServerModel, Client, ClientModel, TripletSampler, SendStrategy
 import utils.utils as utils
 from progress.bar import IncrementalBar
 
