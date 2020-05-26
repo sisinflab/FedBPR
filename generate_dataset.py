@@ -25,9 +25,9 @@ def main(args):
         else:
             df = pd.read_csv('raw_datasets/' + dataset + '.tsv', sep='\t',
                              dtype={'rating': 'float64', 'utc': 'int64'}, header=0, names=names)
-        df = df.groupby('user_id').filter(lambda x: len(x) >= 20)
         df = df.groupby(['user_id', 'item_id'])['utc'].max().reset_index()
         df['rating'] = 1
+        df = df.groupby('user_id').filter(lambda x: len(x) >= 20)
         df = df[['user_id', 'item_id', 'rating', 'utc']]
         print(df.shape[0], 'interactions read')
         df, _ = utils.convert_unique_idx(df, 'user_id')
@@ -39,8 +39,8 @@ def main(args):
         train_user_lists, validation_user_lists, test_user_lists = utils.split_train_test(total_user_lists,
                                                                                           test_size=0.2)
 
-        if not os.path.exists('sets'):
-            os.makedirs('sets')
+        if not os.path.exists('datasets'):
+            os.makedirs('datasets')
         with open('datasets/{}_trainingset.tsv'.format(dataset), 'w') as out:
             for u, train_list in enumerate(train_user_lists):
                 for i in train_list:

@@ -54,6 +54,7 @@ def split_train_test(user_list, test_size=0.2, validation_size=0) -> Tuple[list,
         item = sorted(item_dict.items(), key=lambda x: x[1], reverse=True)
 
         latest_item = item[:int(len(item)*test_size)]
+        print(user, max(item_dict.values()), latest_item[0][1])
         assert max(item_dict.values()) == latest_item[0][1]
         test_item = set(map(lambda x: x[0], latest_item))
         assert len(test_item) > 0, "No test item for user %d" % user
