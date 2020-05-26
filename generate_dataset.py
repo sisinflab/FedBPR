@@ -26,6 +26,7 @@ def main(args):
             df = pd.read_csv('raw_datasets/' + dataset + '.tsv', sep='\t',
                              dtype={'rating': 'float64', 'utc': 'int64'}, header=0, names=names)
         df = df.groupby('user_id').filter(lambda x: len(x) >= 20)
+        df = df.groupby(['user_id', 'item_id'])['utc'].max().reset_index()
         print(df.shape[0], 'interactions read')
         df, _ = utils.convert_unique_idx(df, 'user_id')
         df, _ = utils.convert_unique_idx(df, 'item_id')
