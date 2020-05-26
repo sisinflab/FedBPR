@@ -29,7 +29,7 @@ class Client:
             d_loss = 1 / (1 + np.exp(x_ij))
 
             wu = self.model.user_vec.copy()
-            self.model.user_vec += lr * (d_loss * (hi - hj) - user_reg * wu)
+            self.model.user_vec += lr * (d_loss * (self.model.item_vecs[i] - self.model.item_vecs[j]) - user_reg * wu)
 
             resulting_dic[j] = np.add(resulting_dic[j], d_loss * (-wu) - negative_item_reg * self.model.item_vecs[j])
             resulting_bias.update({j: resulting_bias[j] - d_loss - bias_reg * self.model.item_bias[j]})
