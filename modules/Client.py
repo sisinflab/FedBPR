@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from collections import defaultdict, deque
-
+from itertools import starmap
 
 class Client:
     def __init__(self, client_id, model, train, train_user_list, sampler_size):
@@ -48,6 +48,6 @@ class Client:
         resulting_bias = defaultdict(float)
 
         sample = self.train_set.sample_user_triples()
-        deque(map(lambda (i, j): operation(i, j), sample), maxlen=0)
+        deque(starmap(lambda i, j: operation(i, j), sample), maxlen=0)
 
         return resulting_dic, resulting_bias
