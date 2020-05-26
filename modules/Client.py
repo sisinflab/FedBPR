@@ -48,6 +48,6 @@ class Client:
         resulting_bias = defaultdict(float)
 
         sample = self.train_set.sample_user_triples()
-        deque(map(lambda i, j: operation(i, j), sample), maxlen=0)
+        deque(map(lambda (i, j): operation(i, j), sample), maxlen=0)
 
         return resulting_dic, resulting_bias
