@@ -18,7 +18,7 @@ def main(args):
 
         # Read the dataset and prepare it for training, validation and test
         names = ['user_id', 'item_id', 'rating', 'utc']
-        df = pd.read_csv('original_datasets/' + dataset + '.tsv', sep='\t',
+        df = pd.read_csv('raw_datasets/' + dataset + '.tsv', sep='\t',
                          dtype={'rating': 'float64', 'utc': 'int64'}, header=0, names=names)
         df = df.groupby('user_id').filter(lambda x: len(x) >= 20)
         print(df.shape[0], 'interactions read')
