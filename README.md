@@ -1,5 +1,7 @@
 # Federated Bayesian Personalized Ranking
 
+**warning**: some code improvements in progress
+
 ## Reproduce experiments
 
 ### Requirements
