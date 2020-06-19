@@ -1,3 +1,9 @@
+<style>
+td {
+  font-size: 50px
+}
+</style>
+
 # Federated Bayesian Personalized Ranking
 
 **warning**: some code improvements in progress
