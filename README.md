@@ -1,8 +1,8 @@
-<style>
+<html><style>
 td {
   font-size: 50px
 }
-</style>
+</style></html>
 
 # Federated Bayesian Personalized Ranking
 
