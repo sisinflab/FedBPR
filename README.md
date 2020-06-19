@@ -49,9 +49,8 @@ user_id item_id predicted_rating
 
 In the following we present the datasets we experimented with and some results
 
-```
-SIGNIFICANCE RESULTS VERY SOON
-```
+
+### Paired t-test results
 
 | Brazil | Random | Top-Pop | User-kNN | Item-kNN | VAE | BPR-MF | FCF | sFPL | sFPL+ | pFPL | pFPL+ |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
